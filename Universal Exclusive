@@ -1,9 +1,3 @@
---[[
-Universal Hub by Meowinc Scripts + Agreed Features
-Rayfield UI + Custom Movement + All-in-One ESP + Aimbot/Anti-Aim
-No persistence; session-only toggles.
-]]
-
 -- // Load Rayfield
 local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/source.lua"))()
 
@@ -33,9 +27,9 @@ end)
 -- UI: Window + Tabs
 -- =====================================================
 local Window = Rayfield:CreateWindow({
-    Name = "Universal Hub by Meowinc Scripts + Agreed Features",
+    Name = "Universal Hub by Meowinc Scripts",
     LoadingTitle = "Universal Hub",
-    LoadingSubtitle = "Meowinc Scripts + Agreed",
+    LoadingSubtitle = "Meowinc Scripts",
     ConfigurationSaving = { Enabled = false },
     Discord = { Enabled = false },
     KeySystem = false
@@ -45,8 +39,8 @@ local TabMovement = Window:CreateTab("Movement")
 local TabScripts = Window:CreateTab("Scripts")
 local TabTroll = Window:CreateTab("Troll / Utility")
 local TabESP = Window:CreateTab("ESP")
-local TabAimbot = Window:CreateTab("Aimbot 🎯")
-local TabAntiAim = Window:CreateTab("Anti-Aim 😡")
+local TabAimbot = Window:CreateTab("Aimbot")
+local TabAntiAim = Window:CreateTab("Anti-Aim")
 
 -- =====================================================
 -- AIMBOT + ANTI-AIM FEATURES (from Addthis.txt)
