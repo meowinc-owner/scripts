@@ -1,192 +1,541 @@
--- Load Rayfield
+--[[
+Universal Hub by Meowinc Scripts
+Rayfield UI + Custom Movement + All-in-One ESP
+No persistence; session-only toggles.
+]]
+
+-- // Load Rayfield
 local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/source.lua"))()
 
--- Services
+-- // Services
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local hrp = character:WaitForChild("HumanoidRootPart")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local HRP = Character:WaitForChild("HumanoidRootPart")
+local Camera = Workspace.CurrentCamera
 
--- Config vars
+-- // Reconnect helpers
+LocalPlayer.CharacterAdded:Connect(function(char)
+	Character = char
+	Humanoid = char:WaitForChild("Humanoid")
+	HRP = char:WaitForChild("HumanoidRootPart")
+end)
+
+-- =====================================================
+-- UI: Window + Tabs
+-- =====================================================
+local Window = Rayfield:CreateWindow({
+	Name = "Universal Hub by Meowinc Scripts",
+	LoadingTitle = "Universal Hub",
+	LoadingSubtitle = "Meowinc Scripts",
+	ConfigurationSaving = { Enabled = false },
+	Discord = { Enabled = false },
+	KeySystem = false
+})
+
+local TabMovement = Window:CreateTab("Movement")
+local TabScripts = Window:CreateTab("Scripts")
+local TabTroll = Window:CreateTab("Troll / Utility")
+local TabESP = Window:CreateTab("ESP")
+
+-- =====================================================
+-- MOVEMENT: Custom implementations (no external)
+-- =====================================================
 local speedActive = false
 local speedValue = 100
 local infiniteJump = false
-local spawnPartsActive = false
+local noclipActive = false
+local flyActive = false
+local invincibleFlyActive = false
+local flySpeed = 100
 
--- Create Window
-local Window = Rayfield:CreateWindow({
-    Name = "MeowincScripts",
-    LoadingTitle = "Universal",
-    LoadingSubtitle = "by MeowincScripts",
-    ConfigurationSaving = {
-        Enabled = false
-    },
-    Discord = {
-        Enabled = false
-    },
-    KeySystem = false
+-- Speed Toggle
+TabMovement:CreateToggle({
+	Name = "Speed (WalkSpeed)",
+	CurrentValue = false,
+	Callback = function(state)
+		speedActive = state
+		if Humanoid and Humanoid.Parent then
+			Humanoid.WalkSpeed = speedActive and speedValue or 16
+		end
+	end
 })
 
--- Tabs
-local movementTab = Window:CreateTab("Movement")
-local scriptsTab = Window:CreateTab("Scripts")
-local trollTab = Window:CreateTab("Troll / Utility")
-
--- Movement Tab
-movementTab:CreateToggle({
-    Name = "Toggle Speed",
-    CurrentValue = false,
-    Callback = function(state)
-        speedActive = state
-        humanoid.WalkSpeed = speedActive and speedValue or 16
-    end
+TabMovement:CreateSlider({
+	Name = "Speed Value",
+	Range = {16, 300},
+	Increment = 1,
+	CurrentValue = speedValue,
+	Callback = function(val)
+		speedValue = val
+		if speedActive and Humanoid then
+			Humanoid.WalkSpeed = speedValue
+		end
+	end
 })
 
-movementTab:CreateToggle({
-    Name = "Infinite Jump",
-    CurrentValue = false,
-    Callback = function(state)
-        infiniteJump = state
-    end
+-- Infinite Jump
+TabMovement:CreateToggle({
+	Name = "Infinite Jump",
+	CurrentValue = false,
+	Callback = function(state)
+		infiniteJump = state
+	end
 })
 
-movementTab:CreateButton({
-    Name = "Fly",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Fly.lua"))()
-    end
-})
-
-movementTab:CreateButton({
-    Name = "Invincible Flight",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/197198/scripts/invincible%20flight%20animation.lua"))()
-    end
-})
-
-movementTab:CreateButton({
-    Name = "Noclip",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Noclip.lua"))()
-    end
-})
-
--- Scripts Tab
-scriptsTab:CreateButton({
-    Name = "Dex",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Dex%20Explorer.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "Inf Yield",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Infinite%20Yield.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "c00lGUI",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/199083/scripts/C00LKID.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "FE ChatHax",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/108324/scripts/FE%20ChatHax.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "JailBreak KickAll",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/58255/scripts/JAILBREAK%20KICK%20ALL%20SCRIPT.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "Grow A Garden Spawner",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/197196/scripts/Grow%20a%20Garden%20Script%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Pet%20Spawner%20%20Seed%20%20Spawner%20%20Egg%20Spawner%20And%20More%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Dark%20Spawner.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "FreeCam",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/155045/scripts/Free%20cam%20script.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "Unlock Workspace Baseparts",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Unlock%20Workspace%20Baseparts.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "Invisible",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Invisible%20Character.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "BTools",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/BTools.lua"))()
-    end
-})
-
-scriptsTab:CreateButton({
-    Name = "Blox Fruits OP Script",
-    Callback = function()
-        loadstring(game:HttpGet("https://obj.wearedevs.net/196545/scripts/Blox%20Fruits%20OP%20Script.lua"))()
-    end
-})
-
--- Troll / Utility Tab
-trollTab:CreateButton({
-    Name = "Clear Workspace",
-    Callback = function()
-        for _, obj in pairs(workspace:GetChildren()) do
-            if obj ~= character and obj.Name ~= "Baseplate" and not obj:IsA("Terrain") then
-                obj:Destroy()
-            end
-        end
-    end
-})
-
-trollTab:CreateToggle({
-    Name = "Spawn Parts (LAGGY)",
-    CurrentValue = false,
-    Callback = function(state)
-        spawnPartsActive = state
-        spawn(function()
-            while spawnPartsActive do
-                local part = Instance.new("Part")
-                part.Size = Vector3.new(4,4,4)
-                part.Position = hrp.Position + Vector3.new(math.random(-50,50), math.random(10,50), math.random(-50,50))
-                part.Anchored = false
-                part.CanCollide = true
-                part.Color = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-                part.Parent = workspace
-                task.wait(0.05)
-            end
-        end)
-    end
-})
-
--- Infinite Jump Handler
 UserInputService.JumpRequest:Connect(function()
-    if infiniteJump then
-        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-    end
+	if infiniteJump and Humanoid then
+		Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+	end
 end)
+
+-- Noclip
+local noclipConn
+local function setNoClip(enabled)
+	if enabled and not noclipConn then
+		noclipConn = RunService.Stepped:Connect(function()
+			if Character then
+				for _, part in ipairs(Character:GetDescendants()) do
+					if part:IsA("BasePart") then
+						part.CanCollide = false
+					end
+				end
+			end
+		end)
+	elseif not enabled and noclipConn then
+		noclipConn:Disconnect()
+		noclipConn = nil
+	end
+end
+
+TabMovement:CreateToggle({
+	Name = "Noclip",
+	CurrentValue = false,
+	Callback = function(state)
+		noclipActive = state
+		setNoClip(noclipActive)
+	end
+})
+
+-- Fly (custom)
+local flyBV, flyBG
+local keyDown = { W=false, A=false, S=false, D=false, Space=false, Ctrl=false }
+
+local function inputBegan(input, gp)
+	if gp then return end
+	if input.KeyCode == Enum.KeyCode.W then keyDown.W = true end
+	if input.KeyCode == Enum.KeyCode.A then keyDown.A = true end
+	if input.KeyCode == Enum.KeyCode.S then keyDown.S = true end
+	if input.KeyCode == Enum.KeyCode.D then keyDown.D = true end
+	if input.KeyCode == Enum.KeyCode.Space then keyDown.Space = true end
+	if input.KeyCode == Enum.KeyCode.LeftControl then keyDown.Ctrl = true end
+end
+local function inputEnded(input, gp)
+	if input.KeyCode == Enum.KeyCode.W then keyDown.W = false end
+	if input.KeyCode == Enum.KeyCode.A then keyDown.A = false end
+	if input.KeyCode == Enum.KeyCode.S then keyDown.S = false end
+	if input.KeyCode == Enum.KeyCode.D then keyDown.D = false end
+	if input.KeyCode == Enum.KeyCode.Space then keyDown.Space = false end
+	if input.KeyCode == Enum.KeyCode.LeftControl then keyDown.Ctrl = false end
+end
+
+UserInputService.InputBegan:Connect(inputBegan)
+UserInputService.InputEnded:Connect(inputEnded)
+
+local flyConn
+local function setFly(enabled, invincible)
+	flyActive = enabled
+	invincibleFlyActive = enabled and invincible or false
+	if enabled then
+		if not HRP then return end
+		-- Body movers
+		flyBV = Instance.new("BodyVelocity")
+		flyBV.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+		flyBV.Velocity = Vector3.new()
+		flyBV.Parent = HRP
+
+		flyBG = Instance.new("BodyGyro")
+		flyBG.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+		flyBG.P = 9e4
+		flyBG.CFrame = HRP.CFrame
+		flyBG.Parent = HRP
+
+		-- optional stability
+		Humanoid.PlatformStand = true
+
+		-- health lock (invincible mode during flight)
+		local healthConn
+		if invincible then
+			healthConn = Humanoid.HealthChanged:Connect(function()
+				if invincibleFlyActive and Humanoid.Health < Humanoid.MaxHealth then
+					Humanoid.Health = Humanoid.MaxHealth
+				end
+			end)
+		end
+
+		-- Motion loop
+		flyConn = RunService.Heartbeat:Connect(function(dt)
+			if not HRP or not flyBV or not flyBG then return end
+			local cf = Camera.CFrame
+			local moveDir = Vector3.new()
+			if keyDown.W then moveDir += cf.LookVector end
+			if keyDown.S then moveDir -= cf.LookVector end
+			if keyDown.A then moveDir -= cf.RightVector end
+			if keyDown.D then moveDir += cf.RightVector end
+			if keyDown.Space then moveDir += Vector3.new(0,1,0) end
+			if keyDown.Ctrl then moveDir -= Vector3.new(0,1,0) end
+			if moveDir.Magnitude > 0 then
+				moveDir = moveDir.Unit
+			end
+			flyBV.Velocity = moveDir * flySpeed
+			flyBG.CFrame = CFrame.new(HRP.Position, HRP.Position + cf.LookVector)
+		end)
+	else
+		if flyConn then flyConn:Disconnect() flyConn = nil end
+		if flyBV then flyBV:Destroy() flyBV = nil end
+		if flyBG then flyBG:Destroy() flyBG = nil end
+		if Humanoid then Humanoid.PlatformStand = false end
+		invincibleFlyActive = false
+	end
+end
+
+TabMovement:CreateToggle({
+	Name = "Fly (WASD + Space/Ctrl)",
+	CurrentValue = false,
+	Callback = function(state)
+		setFly(state, false)
+	end
+})
+
+TabMovement:CreateSlider({
+	Name = "Fly Speed",
+	Range = {25, 500},
+	Increment = 5,
+	CurrentValue = flySpeed,
+	Callback = function(val)
+		flySpeed = val
+	end
+})
+
+TabMovement:CreateToggle({
+	Name = "Invincible Flight (Fly + Godmode)",
+	CurrentValue = false,
+	Callback = function(state)
+		setFly(state, true)
+	end
+})
+
+-- =====================================================
+-- SCRIPTS (external one-click)
+-- =====================================================
+local function addButton(tab, name, url)
+	tab:CreateButton({
+		Name = name,
+		Callback = function()
+			loadstring(game:HttpGet(url))()
+		end
+	})
+end
+
+addButton(TabScripts, "Dex", "https://obj.wearedevs.net/2/scripts/Dex%20Explorer.lua")
+addButton(TabScripts, "Inf Yield", "https://obj.wearedevs.net/2/scripts/Infinite%20Yield.lua")
+addButton(TabScripts, "c00lGUI", "https://obj.wearedevs.net/199083/scripts/C00LKID.lua")
+addButton(TabScripts, "FE ChatHax", "https://obj.wearedevs.net/108324/scripts/FE%20ChatHax.lua")
+addButton(TabScripts, "JailBreak KickAll", "https://obj.wearedevs.net/58255/scripts/JAILBREAK%20KICK%20ALL%20SCRIPT.lua")
+addButton(TabScripts, "Grow A Garden Spawner", "https://obj.wearedevs.net/197196/scripts/Grow%20a%20Garden%20Script%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Pet%20Spawner%20%20Seed%20%20Spawner%20%20Egg%20Spawner%20And%20More%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Dark%20Spawner.lua")
+addButton(TabScripts, "FreeCam", "https://obj.wearedevs.net/155045/scripts/Free%20cam%20script.lua")
+addButton(TabScripts, "Unlock Workspace Baseparts", "https://obj.wearedevs.net/2/scripts/Unlock%20Workspace%20Baseparts.lua")
+addButton(TabScripts, "Invisible", "https://obj.wearedevs.net/2/scripts/Invisible%20Character.lua")
+addButton(TabScripts, "BTools", "https://obj.wearedevs.net/2/scripts/BTools.lua")
+addButton(TabScripts, "Blox Fruits OP Script", "https://obj.wearedevs.net/196545/scripts/Blox%20Fruits%20OP%20Script.lua")
+
+-- =====================================================
+-- TROLL / UTILITY
+-- =====================================================
+TabTroll:CreateButton({
+	Name = "Clear Workspace (except your character, Baseplate, Terrain)",
+	Callback = function()
+		for _, obj in ipairs(workspace:GetChildren()) do
+			if obj ~= Character and obj.Name ~= "Baseplate" and not obj:IsA("Terrain") then
+				obj:Destroy()
+			end
+		end
+	end
+})
+
+local spawnPartsActive = false
+TabTroll:CreateToggle({
+	Name = "Spawn Parts (LAGGY)",
+	CurrentValue = false,
+	Callback = function(state)
+		spawnPartsActive = state
+		if state then
+			spawn(function()
+				while spawnPartsActive do
+					local part = Instance.new("Part")
+					part.Size = Vector3.new(4,4,4)
+					part.Position = HRP.Position + Vector3.new(math.random(-50,50), math.random(10,50), math.random(-50,50))
+					part.Anchored = false
+					part.CanCollide = true
+					part.Color = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+					part.Parent = workspace
+					task.wait(0.05)
+				end
+			end)
+		end
+	end
+})
+
+-- =====================================================
+-- ESP: All-in-One System (Boxes, Names, Tracers, Health, Distance, TeamCheck)
+-- Uses Drawing API when available; otherwise falls back to Highlights/Billboards.
+-- =====================================================
+local ESP = {
+	Enabled = true,
+	Boxes = true,
+	Names = true,
+	Tracers = false,
+	Health = true,
+	Distance = true,
+	TeamCheck = false,
+	MaxDistance = 2000,
+	UseTeamColors = true
+}
+
+-- UI Controls
+TabESP:CreateToggle({ Name = "ESP Enabled", CurrentValue = ESP.Enabled, Callback = function(s) ESP.Enabled = s end })
+TabESP:CreateToggle({ Name = "Boxes", CurrentValue = ESP.Boxes, Callback = function(s) ESP.Boxes = s end })
+TabESP:CreateToggle({ Name = "Names", CurrentValue = ESP.Names, Callback = function(s) ESP.Names = s end })
+TabESP:CreateToggle({ Name = "Tracers", CurrentValue = ESP.Tracers, Callback = function(s) ESP.Tracers = s end })
+TabESP:CreateToggle({ Name = "Health", CurrentValue = ESP.Health, Callback = function(s) ESP.Health = s end })
+TabESP:CreateToggle({ Name = "Distance", CurrentValue = ESP.Distance, Callback = function(s) ESP.Distance = s end })
+TabESP:CreateToggle({ Name = "Team Check", CurrentValue = ESP.TeamCheck, Callback = function(s) ESP.TeamCheck = s end })
+TabESP:CreateToggle({ Name = "Use Team Colors", CurrentValue = ESP.UseTeamColors, Callback = function(s) ESP.UseTeamColors = s end })
+TabESP:CreateSlider({ Name = "Max Distance", Range = {100, 10000}, Increment = 50, CurrentValue = ESP.MaxDistance, Callback = function(v) ESP.MaxDistance = v end })
+
+-- Drawing helpers / fallback
+local hasDrawing = pcall(function() return Drawing ~= nil end)
+
+-- Per-player drawings
+local visuals = {}
+
+local function newDrawingObjects()
+	return {
+		Box = hasDrawing and Drawing.new("Square") or nil,
+		Name = hasDrawing and Drawing.new("Text") or nil,
+		Tracer = hasDrawing and Drawing.new("Line") or nil,
+		HealthBar = hasDrawing and Drawing.new("Square") or nil,
+		HealthBG = hasDrawing and Drawing.new("Square") or nil,
+	}
+end
+
+local function removeVisual(v)
+	if not v then return end
+	for _,obj in pairs(v) do
+		if obj and obj.Remove then obj:Remove() end
+		if obj and obj.Destroy then obj:Destroy() end
+	end
+end
+
+local function getTeamColor(plr)
+	if ESP.UseTeamColors and plr.TeamColor then
+		local c = plr.TeamColor.Color
+		return Color3.new(c.R, c.G, c.B)
+	end
+	return Color3.new(1,1,1)
+end
+
+local function worldToViewport(pos)
+	local vec, onScreen = Camera:WorldToViewportPoint(pos)
+	return Vector2.new(vec.X, vec.Y), onScreen, vec.Z
+end
+
+local function getAABB(model)
+	local cf, size = model:GetBoundingBox()
+	local points = {}
+	for x=-0.5,0.5,1 do
+		for y=-0.5,0.5,1 do
+			for z=-0.5,0.5,1 do
+				local corner = (cf * CFrame.new(size.X*x, size.Y*y, size.Z*z)).Position
+				table.insert(points, corner)
+			end
+		end
+	end
+	local min = Vector2.new(math.huge, math.huge)
+	local max = Vector2.new(-math.huge, -math.huge)
+	local anyOn = false
+	local minZ = math.huge
+	for _, p in ipairs(points) do
+		local v2, on, z = worldToViewport(p)
+		if on then
+			anyOn = true
+			min = Vector2.new(math.min(min.X, v2.X), math.min(min.Y, v2.Y))
+			max = Vector2.new(math.max(max.X, v2.X), math.max(max.Y, v2.Y))
+			minZ = math.min(minZ, z)
+		end
+	end
+	return min, max, anyOn, minZ
+end
+
+local function formatDistance(studs)
+	return string.format("%0.0f", studs).."s"
+end
+
+-- Build visuals for a player
+local function ensureVisuals(plr)
+	if visuals[plr] then return visuals[plr] end
+	visuals[plr] = newDrawingObjects()
+	local v = visuals[plr]
+	if hasDrawing then
+		-- defaults
+		v.Box.Thickness = 1
+		v.Box.Filled = false
+		v.Box.Color = Color3.new(1,1,1)
+		v.Box.Visible = false
+
+		v.Name.Size = 13
+		v.Name.Center = true
+		v.Name.Outline = true
+		v.Name.Visible = false
+
+		v.Tracer.Thickness = 1
+		v.Tracer.Visible = false
+
+		v.HealthBG.Filled = true
+		v.HealthBG.Color = Color3.new(0,0,0)
+		v.HealthBG.Visible = false
+
+		v.HealthBar.Filled = true
+		v.HealthBar.Color = Color3.new(0,1,0)
+		v.HealthBar.Visible = false
+	end
+	return v
+end
+
+local function updatePlayerESP(plr)
+	local v = ensureVisuals(plr)
+	if not hasDrawing then return end -- (simple fallback omitted)
+
+	local char = plr.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if not char or not hum or hum.Health <= 0 then
+		-- hide
+		v.Box.Visible = false
+		v.Name.Visible = false
+		v.Tracer.Visible = false
+		v.HealthBar.Visible = false
+		v.HealthBG.Visible = false
+		return
+	end
+
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+
+	-- Team check
+	if ESP.TeamCheck and plr.Team == LocalPlayer.Team then
+		v.Box.Visible = false
+		v.Name.Visible = false
+		v.Tracer.Visible = false
+		v.HealthBar.Visible = false
+		v.HealthBG.Visible = false
+		return
+	end
+
+	local distance = (HRP.Position - hrp.Position).Magnitude
+	if distance > ESP.MaxDistance then
+		v.Box.Visible = false
+		v.Name.Visible = false
+		v.Tracer.Visible = false
+		v.HealthBar.Visible = false
+		v.HealthBG.Visible = false
+		return
+	end
+
+	local min, max, onScreen, z = getAABB(char)
+	if not onScreen then
+		v.Box.Visible = false
+		v.Name.Visible = false
+		v.Tracer.Visible = false
+		v.HealthBar.Visible = false
+		v.HealthBG.Visible = false
+		return
+	end
+
+	local boxSize = max - min
+	local boxPos = min
+	local teamColor = getTeamColor(plr)
+
+	-- Box
+	v.Box.Visible = ESP.Enabled and ESP.Boxes
+	v.Box.Position = boxPos
+	v.Box.Size = boxSize
+	v.Box.Color = teamColor
+
+	-- Name + distance line
+	v.Name.Visible = ESP.Enabled and ESP.Names
+	local label = plr.Name
+	if ESP.Distance then
+		label = label .. " [" .. formatDistance(distance) .. "]"
+	end
+	v.Name.Text = label
+	v.Name.Position = Vector2.new(boxPos.X + boxSize.X/2, boxPos.Y - 14)
+	v.Name.Color = teamColor
+
+	-- Tracer (bottom center of screen -> bottom of box)
+	v.Tracer.Visible = ESP.Enabled and ESP.Tracers
+	if v.Tracer.Visible then
+		v.Tracer.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y - 10)
+		v.Tracer.To = Vector2.new(boxPos.X + boxSize.X/2, boxPos.Y + boxSize.Y)
+		v.Tracer.Color = teamColor
+	end
+
+	-- Health bar (left side of box)
+	local healthFrac = math.clamp(hum.Health / math.max(1, hum.MaxHealth), 0, 1)
+	local barH = boxSize.Y
+	local barW = 3
+	v.HealthBG.Visible = ESP.Enabled and ESP.Health
+	v.HealthBar.Visible = ESP.Enabled and ESP.Health
+	if v.HealthBG.Visible then
+		v.HealthBG.Position = Vector2.new(boxPos.X - (barW + 2), boxPos.Y)
+		v.HealthBG.Size = Vector2.new(barW, barH)
+	end
+	if v.HealthBar.Visible then
+		v.HealthBar.Position = Vector2.new(boxPos.X - (barW + 2), boxPos.Y + (1-healthFrac)*barH)
+		v.HealthBar.Size = Vector2.new(barW, barH * healthFrac)
+		v.HealthBar.Color = Color3.fromRGB(255*(1-healthFrac), 255*healthFrac, 0)
+	end
+end
+
+-- Cleanup on player remove
+Players.PlayerRemoving:Connect(function(plr)
+	removeVisual(visuals[plr])
+	visuals[plr] = nil
+end)
+
+-- Main ESP loop
+RunService.RenderStepped:Connect(function()
+	if not ESP.Enabled then
+		for plr, v in pairs(visuals) do
+			if v.Box then v.Box.Visible = false end
+			if v.Name then v.Name.Visible = false end
+			if v.Tracer then v.Tracer.Visible = false end
+			if v.HealthBar then v.HealthBar.Visible = false end
+			if v.HealthBG then v.HealthBG.Visible = false end
+		end
+		return
+	end
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= LocalPlayer then
+			updatePlayerESP(plr)
+		end
+	end
+end)
+
+-- =====================================================
+-- Done. Rayfield handles its own show/hide toggle.
+-- =====================================================
