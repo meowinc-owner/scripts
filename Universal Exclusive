@@ -1,0 +1,192 @@
+-- Load Rayfield
+local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/source.lua"))()
+
+-- Services
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+-- Config vars
+local speedActive = false
+local speedValue = 100
+local infiniteJump = false
+local spawnPartsActive = false
+
+-- Create Window
+local Window = Rayfield:CreateWindow({
+    Name = "TEAM 40FR0XX V1.2",
+    LoadingTitle = "TEAM 40FR0XX",
+    LoadingSubtitle = "by You",
+    ConfigurationSaving = {
+        Enabled = false
+    },
+    Discord = {
+        Enabled = false
+    },
+    KeySystem = false
+})
+
+-- Tabs
+local movementTab = Window:CreateTab("Movement")
+local scriptsTab = Window:CreateTab("Scripts")
+local trollTab = Window:CreateTab("Troll / Utility")
+
+-- Movement Tab
+movementTab:CreateToggle({
+    Name = "Toggle Speed",
+    CurrentValue = false,
+    Callback = function(state)
+        speedActive = state
+        humanoid.WalkSpeed = speedActive and speedValue or 16
+    end
+})
+
+movementTab:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Callback = function(state)
+        infiniteJump = state
+    end
+})
+
+movementTab:CreateButton({
+    Name = "Fly",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Fly.lua"))()
+    end
+})
+
+movementTab:CreateButton({
+    Name = "Invincible Flight",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/197198/scripts/invincible%20flight%20animation.lua"))()
+    end
+})
+
+movementTab:CreateButton({
+    Name = "Noclip",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Noclip.lua"))()
+    end
+})
+
+-- Scripts Tab
+scriptsTab:CreateButton({
+    Name = "Dex",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Dex%20Explorer.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "Inf Yield",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Infinite%20Yield.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "c00lGUI",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/199083/scripts/C00LKID.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "FE ChatHax",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/108324/scripts/FE%20ChatHax.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "JailBreak KickAll",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/58255/scripts/JAILBREAK%20KICK%20ALL%20SCRIPT.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "Grow A Garden Spawner",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/197196/scripts/Grow%20a%20Garden%20Script%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Pet%20Spawner%20%20Seed%20%20Spawner%20%20Egg%20Spawner%20And%20More%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Dark%20Spawner.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "FreeCam",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/155045/scripts/Free%20cam%20script.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "Unlock Workspace Baseparts",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Unlock%20Workspace%20Baseparts.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "Invisible",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Invisible%20Character.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "BTools",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/BTools.lua"))()
+    end
+})
+
+scriptsTab:CreateButton({
+    Name = "Blox Fruits OP Script",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/196545/scripts/Blox%20Fruits%20OP%20Script.lua"))()
+    end
+})
+
+-- Troll / Utility Tab
+trollTab:CreateButton({
+    Name = "Clear Workspace",
+    Callback = function()
+        for _, obj in pairs(workspace:GetChildren()) do
+            if obj ~= character and obj.Name ~= "Baseplate" and not obj:IsA("Terrain") then
+                obj:Destroy()
+            end
+        end
+    end
+})
+
+trollTab:CreateToggle({
+    Name = "Spawn Parts (LAGGY)",
+    CurrentValue = false,
+    Callback = function(state)
+        spawnPartsActive = state
+        spawn(function()
+            while spawnPartsActive do
+                local part = Instance.new("Part")
+                part.Size = Vector3.new(4,4,4)
+                part.Position = hrp.Position + Vector3.new(math.random(-50,50), math.random(10,50), math.random(-50,50))
+                part.Anchored = false
+                part.CanCollide = true
+                part.Color = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+                part.Parent = workspace
+                task.wait(0.05)
+            end
+        end)
+    end
+})
+
+-- Infinite Jump Handler
+UserInputService.JumpRequest:Connect(function()
+    if infiniteJump then
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
