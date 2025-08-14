@@ -1,3 +1,28 @@
+-- https://github.com/OopssSorry/LuaU-Free-Key-System-UI/
+
+local KeySystem = loadstring(game:HttpGet("https://raw.githubusercontent.com/OopssSorry/LuaU-Free-Key-System-UI/main/source.lua"))()
+local KeyValid = false
+local response = KeySystem:Init({
+	Debug=false, -- <bool> Prints some output in console when true
+	Title="Universal | Key System", -- <string or nil> Title of key system
+	Description="by Meowinc Scripts", -- <string or nil> Description of key system
+	Link="https://discord.gg/E4sZCqPbr7", -- <string> String to get key
+	Discord=nil, -- <string or nil> Button to join your discord server
+	SaveKey=false, -- <bool or nil> Just auto save key
+	Verify=function(key) -- <function> Verify is key valid
+		if key=="randomkey123" then
+      KeyValid=true
+			return true
+		else
+			return false
+		end
+	end,
+	GuiParent = game.CoreGui, -- <object or nil> :3
+})
+
+if not response or not KeyValid then return end
+-- HERE YOUR SCRIPT
+
 -- // Load Rayfield
 local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/source.lua"))()
 
