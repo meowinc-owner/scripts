@@ -1,63 +1,76 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-local Window = OrionLib:MakeWindow({Name = "KeySystem", HidePremium = true, SaveConfig = true, ConfigFolder = "OrionTest"})
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/amorestar/raceclickerroblox/refs/heads/main/raceclickergui.lua"))()
 
-OrionLib:MakeNotification({
-	Name = "Your in!",
-	Content = "Your In The Special LEAN party",
-	Image = "rbxassetid://4483345998",
-	Time = 5
+local Window = Library:Window({
+    Title = "Troll GUI - Key System",
+    Desc = "by Meowinc Scripts",
+    Icon = 105059922903197,
+    Theme = "Amethyst",
+    Config = {
+        Keybind = Enum.KeyCode.LeftControl,
+        Size = UDim2.new(0, 1000, 0, 500)
+    },
+    CloseUIButton = {
+        Enabled = true,
+        Text = "Key System"
+    }
 })
 
-_G.Key = "NEW" -- You Put Your Key Here
-_G.KeyInput = "string"
+local key = "Troll07" -- Replace with your actual key
 
-function MakeScriptHub()
-loadstring(game:HttpGet((""), true))() -- You Put Your Script Here
+local function UnloadEverything()
 
-end
-
-
-function CorrectKeyNotifications()
-    OrionLib:MakeNotification({
-        Name = "Correct Key",
-        Content = "Welcome To The LEAN PARTY :D",
-        Image = "rbxassetid://4483345998",
-        Time = 5
-    })
-end
-
-function WrongKeyNotifications()
-    OrionLib:MakeNotification({
-        Name = " Wrong Key",
-        Content = "Your Not on The List Kid",
-        Image = "rbxassetid://4483345998",
-        Time = 5
-    })
-end
-
-local Tab = Window:MakeTab({
-	Name = "Key Room",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-
-Tab:AddTextbox({
-	Name = "Enter Key",
-	Default = "Enter Key",
-	TextDisappear = true,
-	Callback = function(Value)
-        _G.KeyInput = Value
-	end	  
-})
-
-Tab:AddButton({
-	Name = "Check Key!",
-	Callback = function()
-        if _G.KeyInput == _G.Key then
-         MakeScriptHub()
-         CorrectKeyNotifications()
-     else
-        WrongKeyNotifications()
+    wait(2)
+    for _, gui in ipairs(game.CoreGui:GetChildren()) do
+        if gui:IsA("ScreenGui") and (
+            gui.Name:lower():find("library") or
+            gui.Name:lower():find("key")
+        ) then
+            gui:Destroy()
         end
-  	end    
+    end
+
+    pcall(function() Library:Close() end)
+
+end
+
+local Tab = Window:Tab({Title = "Key System", Icon = "wrench"}) do
+    Tab:Section({Title = "Thank you for choosing Meowinc Scripts!"})
+    Tab:Section({Title = "This script's key system is completely adless, just join the discord server to get the key."})
+    
+    Tab:Button({
+    Title = "Get Key",
+    Desc = "Click to copy key link",
+    Callback = function()
+        -- Xeno supports setclipboard
+        setclipboard("https://discord.gg/E4sZCqPbr7")
+        Library:Notification("Key System", "Copied key link to clipboard!", "Ok")
+    end
 })
+
+    Tab:Textbox({
+        Title = "Enter a key",
+        Placeholder = "Put your key here",
+        ClearTextOnFocus = false,
+        Callback = function(text)
+            if text == key then
+                Window:Notify({
+                    Title = "Key System",
+                    Desc = "Successfully entered the key!\nLoading script...",
+                    Time = 4.5 
+                })
+                task.delay(0.1, UnloadEverything)
+
+
+                wait(3)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/meowinc-owner/scripts/refs/heads/main/Troll%20is%20a%20Pinning%20Tower%202"))() -- your actual script URL
+
+            else
+                Window:Notify({
+                    Title = "Key system",
+                    Desc = "Invalid key! Please try again.",
+                    Time = 3  
+                })
+            end
+        end
+    })
+end
